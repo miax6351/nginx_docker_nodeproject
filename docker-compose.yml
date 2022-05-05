@@ -12,7 +12,7 @@ services:
       - app-network
 
   webserver:
-    image: nginx:mainline-alpine
+    image: nginx:latest
     container_name: webserver
     restart: unless-stopped
     ports:
@@ -24,6 +24,7 @@ services:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - ./certbot/www:/var/www/studenthub.bhsi.xyz/
+      - dhparam:/etc/ssl/certs
     depends_on:
       - nodejs
     networks:
@@ -49,6 +50,12 @@ volumes:
     driver_opts:
       type: none
       device: /home/s205353/node_project/views/
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/s205353/node_project/dhparam/
       o: bind
 
 networks:
