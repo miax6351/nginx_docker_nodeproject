@@ -1,0 +1,56 @@
+dddversion: '3'
+
+services:
+  nodejs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nodejs
+    container_name: nodejs
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - web-root:/var/www/studenthub.bhsi.xyz/html
+      - ./nginx-conf:/etc/nginx/conf.d/
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - ./certbot/www:/var/www/studenthub.bhsi.xyz/
+    depends_on:
+      - nodejs
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/studenthub.bhsi.xyz/html
+      - ./certbot/www/:/var/www/studenthub.bhsi.xyz/
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/var/www/studenthub.bhsi.xyz/html --email miadong179@gmail.com --agree-tos --no-eff-email --staging -d www.studenthub.bhsi.xyz  -d www.studenthub.bhsi.xyz
+
+volumes:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/s205353/node_project/views/
+      o: bind
+
+networks:
+  app-network:
+    driver: bridge
