@@ -1,15 +1,31 @@
-version: '3'
+version: '3.3'
 
 services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: studenthub
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+
   nodejs:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     image: nodejs
     container_name: nodejs
     restart: unless-stopped
     networks:
       - app-network
+    depends_on:
+      - mariadb
 
   webserver:
     image: nginx:latest
@@ -43,6 +59,7 @@ services:
     command: certonly --webroot --webroot-path=/var/www/studenthub.bhsi.xyz/html --email miadong179@gmail.com --agree-tos --no-eff-email --staging -d www.studenthub.bhsi.xyz  -d www.studenthub.bhsi.xyz
 
 volumes:
+  db-data:
   certbot-etc:
   certbot-var:
   web-root:
