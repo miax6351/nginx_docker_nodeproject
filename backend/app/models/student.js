@@ -6,7 +6,8 @@ module.exports = (sequelize, Datatypes) => {
       firstName: { type: Datatypes.STRING, allowNull: false },
       lastName: { type: Datatypes.TEXT, allowNull: true },
       mail: { type: Datatypes.STRING, allowNull: false},
-      studyclassId: { type: Datatypes.STRING, allowNull: true} 
+      studyclassId: { type: Datatypes.STRING, allowNull: true},
+      token: { type: Datatypes.STRING, allowNull: false}  
 
     },
     {
@@ -17,8 +18,7 @@ module.exports = (sequelize, Datatypes) => {
 
     Student.associate = function (models) {
       models.student.hasMany(models.announcement)
-      //models.student.belongsTo(models.studentCourses)
-      models.student.belongsTo(models.studyclass)
+    //  models.student.belongsTo(models.studyclass)
       models.student.hasOne(models.lessonplan)
     }
 
